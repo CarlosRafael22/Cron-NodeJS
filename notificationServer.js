@@ -21,11 +21,13 @@ function listenForNotificationRequests() {
   var requests = ref.child('notificationRequests');
   requests.on('child_added', function(requestSnapshot) {
     var request = requestSnapshot.val();
+    //console.log(requestSnapshot.key);
     sendNotificationToUser(
       request.username, 
       request.message,
+      request.messageKey,
       function() {
-        //requestSnapshot.ref.remove();
+        requestSnapshot.ref.remove();
       }
     );
   }, function(error) {
@@ -33,7 +35,7 @@ function listenForNotificationRequests() {
   });
 };
 
-function sendNotificationToUser(username, message, onSuccess) {
+function sendNotificationToUser(username, message, messageKey, onSuccess) {
   request({
     url: 'https://fcm.googleapis.com/fcm/send',
     method: 'POST',
@@ -44,7 +46,8 @@ function sendNotificationToUser(username, message, onSuccess) {
     body: JSON.stringify({
       "data" : {
         "message" : message,
-        "username" : username
+        "username" : username,
+        "messageKey" : messageKey
       },
       // "notification": {
       //   "title" : "Nova mensagem em ChatApp",
